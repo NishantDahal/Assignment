@@ -4,15 +4,17 @@
   
   (setq email (string-downcase email))
   
-  (loop for keyword in spam-keywords
-        until (not (search keyword email))
-        return t)
-  
-  (loop for domain in suspicious-sender-domains
-        until (not (search (format nil "@~a" domain) email))
-        return t)
-  
-  nil)
+  (let ((found-keyword nil)
+        (found-domain nil))
+    (loop for keyword in spam-keywords
+          until (search keyword email)
+          do (setq found-keyword t))
+
+    (loop for domain in suspicious-sender-domains
+          until (search (format nil "@~a" domain) email)
+          do (setq found-domain t))
+
+    (or found-keyword found-domain)))
 
 (let ((email-text "Congratulations! Congratulations!! Congratulations!!! You've won a free gift. Click here to claim it now."))
   (if (is-spam email-text)
